@@ -7,11 +7,13 @@
         <entry key="..\:/androidProject/boGeStudyDemo/GoodBle/app/src/main/res/drawable/ic_bluetooth_connected.xml" value="0.1" />
         <entry key="..\:/androidProject/boGeStudyDemo/GoodBle/app/src/main/res/drawable/ic_bluetooth_disabled.xml" value="0.1" />
         <entry key="..\:/androidProject/boGeStudyDemo/GoodBle/app/src/main/res/drawable/ic_bluetooth_scan.xml" value="0.1" />
+        <entry key="..\:/androidProject/boGeStudyDemo/GoodBle/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1505" />
         <entry key="..\:/androidProject/boGeStudyDemo/GoodBle/app/src/main/res/drawable/ic_location_disabled.xml" value="0.1" />
         <entry key="..\:/androidProject/boGeStudyDemo/GoodBle/app/src/main/res/drawable/ic_location_off.xml" value="0.1" />
         <entry key="..\:/androidProject/boGeStudyDemo/GoodBle/app/src/main/res/drawable/ic_scan_ble.xml" value="0.1" />
+        <entry key="..\:/androidProject/boGeStudyDemo/GoodBle/app/src/main/res/drawable/test.xml" value="0.1505" />
         <entry key="..\:/androidProject/boGeStudyDemo/GoodBle/app/src/main/res/layout/activity_main.xml" value="0.1" />
-        <entry key="..\:/androidProject/boGeStudyDemo/GoodBle/app/src/main/res/layout/activity_scan.xml" value="0.22552083333333334" />
+        <entry key="..\:/androidProject/boGeStudyDemo/GoodBle/app/src/main/res/layout/activity_scan.xml" value="0.1" />
         <entry key="..\:/androidProject/boGeStudyDemo/GoodBle/app/src/main/res/layout/item_device_rv.xml" value="0.2" />
         <entry key="..\:/androidProject/boGeStudyDemo/GoodBle/app/src/main/res/layout/lay_android12_should_connect.xml" value="0.1" />
         <entry key="..\:/androidProject/boGeStudyDemo/GoodBle/app/src/main/res/layout/lay_android12_should_scan.xml" value="0.10822401614530777" />

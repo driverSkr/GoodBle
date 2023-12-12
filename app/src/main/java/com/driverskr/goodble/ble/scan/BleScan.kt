@@ -20,7 +20,7 @@ class BleScan private constructor(private val context: Context) {
     private var mScanFilters: List<ScanFilter>
     private var mScanSettings: ScanSettings
     private var bleScanCallback: BleScanCallback? = null
-    var mIsScanning = false
+    private var mIsScanning = false
 
     init {
         mScanFilters = ArrayList()

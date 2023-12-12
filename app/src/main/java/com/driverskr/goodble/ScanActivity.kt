@@ -1,6 +1,7 @@
 package com.driverskr.goodble
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.ScanResult
@@ -12,19 +13,29 @@ import android.provider.Settings
 import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.SimpleItemAnimator
+import com.driverskr.goodble.adapter.BleDeviceAdapter
+import com.driverskr.goodble.adapter.OnItemClickListener
 import com.driverskr.goodble.base.BaseActivity
 import com.driverskr.goodble.base.viewBinding
 import com.driverskr.goodble.ble.BleCore
+import com.driverskr.goodble.ble.BleDevice
 import com.driverskr.goodble.ble.scan.BleScanCallback
 import com.driverskr.goodble.ble.scan.ReceiverCallback
 import com.driverskr.goodble.ble.scan.ScanReceiver
 import com.driverskr.goodble.databinding.ActivityScanBinding
 
-class ScanActivity : BaseActivity(), View.OnClickListener, BleScanCallback, ReceiverCallback {
+class ScanActivity : BaseActivity(), View.OnClickListener, BleScanCallback, ReceiverCallback,
+    OnItemClickListener {
 
     private val binding by viewBinding(ActivityScanBinding::inflate)
 
     private lateinit var bleCore: BleCore
+
+    private var mAdapter: BleDeviceAdapter? = null
+    //设备列表
+    private val mList: MutableList<BleDevice> = mutableListOf()
 
     //蓝牙连接权限
     private val requestConnect =
@@ -131,7 +142,7 @@ class ScanActivity : BaseActivity(), View.OnClickListener, BleScanCallback, Rece
         }
         binding.tvScanStatus.visibility = View.VISIBLE
         //开始扫描
-
+        if (!bleCore.isScanning()) startScan()
     }
 
     override fun onStop() {
@@ -177,7 +188,10 @@ class ScanActivity : BaseActivity(), View.OnClickListener, BleScanCallback, Rece
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun startScan() {
+        mList.clear()
+        mAdapter?.notifyDataSetChanged()
         bleCore.startScan()
         binding.tvScanStatus.text = "停止"
         binding.pbScanLoading.visibility = View.VISIBLE
@@ -190,10 +204,57 @@ class ScanActivity : BaseActivity(), View.OnClickListener, BleScanCallback, Rece
     }
 
     /**
+     * 用于在列表中找是否有添加过设备
+     */
+    private fun findIndex(bleDevice: BleDevice, mList: MutableList<BleDevice>): Int {
+        var index = 0
+        for (devi in mList) {
+            if (bleDevice.macAddress.contentEquals(devi.macAddress)) return index
+            index += 1
+        }
+        return -1
+    }
+
+    /**
      * 扫描接口
      */
+    @SuppressLint("NotifyDataSetChanged")
     override fun onScanResult(result: ScanResult) {
-        TODO("Not yet implemented")
+        if (result.scanRecord!!.deviceName == null) return
+        if (result.scanRecord!!.deviceName!!.isEmpty()) return
+        val bleDevice = BleDevice(
+            result.scanRecord!!.deviceName,
+            result.device.address,
+            result.rssi,
+            result.device
+        )
+        Log.d(TAG, "onScanResult: ${bleDevice.macAddress}")
+        if (mList.size == 0) {
+            mList.add(bleDevice)
+        } else {
+            val index = findIndex(bleDevice, mList)
+            if (index == -1) {
+                //添加新设备
+                mList.add(bleDevice)
+            } else {
+                //更新已有设备的rssi
+                mList[index].rssi = bleDevice.rssi
+            }
+        }
+        //如果未扫描到设备，则显示空内容布局
+        binding.emptyLay.root.visibility = if (mList.size == 0) View.VISIBLE else View.GONE
+        //如果mAdapter为空则会执行run{}中的代码，进行相关配置，最终返回配置的结果mAdapter
+        mAdapter ?: run {
+            mAdapter = BleDeviceAdapter(mList)
+            binding.rvDevice.apply {
+                (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+                layoutManager = LinearLayoutManager(this@ScanActivity)
+                adapter = mAdapter
+            }
+            mAdapter!!.setOnItemClickListener(this@ScanActivity)
+            mAdapter
+        }
+        mAdapter!!.notifyDataSetChanged()
     }
 
     /**
@@ -216,5 +277,14 @@ class ScanActivity : BaseActivity(), View.OnClickListener, BleScanCallback, Rece
             stopScan()
             binding.enableLocationLay.root.visibility = View.VISIBLE
         }
+    }
+
+    override fun onItemClick(view: View?, position: Int) {
+        if (bleCore.isScanning()) stopScan()
+        //选择设备处理
+        val intent = Intent()
+        intent.putExtra("device", mList[position].device)
+        setResult(RESULT_OK, intent)
+        finish()
     }
 }
