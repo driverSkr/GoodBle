@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.BluetoothDevice
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import com.driverskr.goodble.base.BaseActivity
@@ -20,11 +21,11 @@ class MainActivity : BaseActivity() {
             if (result.resultCode == Activity.RESULT_OK) {
                 if (result.data == null) return@registerForActivityResult
                 //获取选中的设备
-                val device = /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                val device = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     result.data!!.getParcelableExtra("device")
-                } else {*/
+                } else {
                     result.data!!.getParcelableExtra("device") as BluetoothDevice?
-                //}
+                }
                 showMsg("${device?.name} , ${device?.address}")
             }
         }
